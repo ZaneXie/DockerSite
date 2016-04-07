@@ -1,3 +1,2 @@
 from php7
-RUN apt-get install php-xdebug
-CMD ["bash", "start.sh"]
+RUN apt-get install -y --force-yes php-xdebug php7.0-zip
