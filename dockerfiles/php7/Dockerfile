@@ -10,7 +10,7 @@ RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/bin/composer
 RUN chmod +x /usr/bin/composer
 RUN composer config -g repo.packagist composer https://packagist.phpcomposer.com
-RUN sed -i "s,;daemonize = yes,deamonize = no,g" /etc/php/7.0/fpm/php-fpm.conf
+RUN sed -i "s,;daemonize = yes,daemonize = no,g" /etc/php/7.0/fpm/php-fpm.conf
 RUN sed -i "s,listen = /run/php/php7.0-fpm.sock,listen = [::]:9000,g" /etc/php/7.0/fpm/pool.d/www.conf
 RUN mkdir /var/run/php
 EXPOSE 9000
