@@ -1,13 +1,24 @@
-FROM ubuntu:14.04
-#ADD ./config/apt.sources.list /etc/apt/sources.list
-RUN apt-get update && apt-get install -y software-properties-common && \
-    add-apt-repository ppa:ondrej/php5 && apt-get update && \
-    apt-get install -y --force-yes php5-fpm php5-mcrypt php5-apcu php5-intl php5-mysql php5-memcache php5-imagick php5-gd php5-curl && \
-    apt-get install -y nginx &&\
-    apt-get install -y curl
-RUN php5enmod mcrypt
-RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && composer global require "fxp/composer-asset-plugin:1.0.0"
-EXPOSE 80
-ADD start.sh /start.sh
-RUN chmod 0755 /start.sh
-CMD ["bash", "start.sh"]
+FROM php:5-fpm
+#RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer \
+#        && composer config -g repo.packagist composer https://packagist.phpcomposer.com \
+#        && composer global require "fxp/composer-asset-plugin:1.0.0"
+
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
+        && sed -i '/deb http:\/\/security.debian.org jessie\/updates main/d' /etc/apt/sources.list \
+        && apt-get update && apt-get remove -y libcurl3 && apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng12-dev \
+        libicu-dev \
+        libcurl4-openssl-dev \
+        libmemcached-dev \
+        zlib1g-dev
+
+RUN  docker-php-ext-install -j$(nproc) mcrypt intl mysqli curl \
+        && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+        && docker-php-ext-install -j$(nproc) gd \
+        &&  pecl install memcached-2.2.0 apcu-4.0.10\
+        && docker-php-ext-enable memcached apcu
+
+RUN docker-php-ext-install pdo_mysql

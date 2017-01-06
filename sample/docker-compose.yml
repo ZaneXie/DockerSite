@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  php:
+    build: ../dockerfiles/yii2-advanced/
+    restart: always
+    networks:
+      - app
+      - db
+    volumes:
+      - ./src:/app
+  frontend:
+    image: nginx:alpine
+    restart: always
+    networks:
+      - proxy
+      - app
+    volumes:
+      - ./nginx.frontend:/etc/nginx/conf.d/default.conf
+      - ./src:/app
+      - ./log:/var/log/nginx
+    environment:
+      - VIRTUAL_HOST=www.example.com,example.com #change this
+  backend:
+    image: nginx:alpine
+    restart: always
+    networks:
+      - proxy
+      - app
+    volumes:
+      - ./nginx.backend:/etc/nginx/conf.d/default.conf
+      - ./src:/app
+      - ./log:/var/log/nginx
+    environment:
+      - VIRTUAL_HOST=example.com
+networks:
+  app:
+  proxy:
+    external:
+      name: common_proxy
+  db:
+    external:
+      name: common_db
+
