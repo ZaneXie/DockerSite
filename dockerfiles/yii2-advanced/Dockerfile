@@ -15,10 +15,9 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
         libmemcached-dev \
         zlib1g-dev
 
-RUN  docker-php-ext-install -j$(nproc) mcrypt intl mysqli curl \
+RUN  docker-php-ext-install -j$(nproc) mcrypt intl mysqli curl pdo_mysql \
         && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
         && docker-php-ext-install -j$(nproc) gd \
         &&  pecl install memcached-2.2.0 apcu-4.0.10\
         && docker-php-ext-enable memcached apcu
 
-RUN docker-php-ext-install pdo_mysql
